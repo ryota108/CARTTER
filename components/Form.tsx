@@ -7,6 +7,7 @@ import { useCallback, useState } from "react";
 import { toast } from "react-hot-toast";
 import Button from "./Button";
 import Avatar from "./Avatar";
+import usePost from "@/hooks/usePost";
 
 interface FormProps {
   placeholder: string;
@@ -19,6 +20,7 @@ const Form: React.FC<FormProps> = ({ placeholder, isComment, postId }) => {
 
   const { data: currentUser } = useCurrentUser();
   const { mutate: mutatePosts } = usePosts();
+  const { mutate: mutatePost } = usePost(postId as string);
 
   const [body, setBody] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -27,17 +29,20 @@ const Form: React.FC<FormProps> = ({ placeholder, isComment, postId }) => {
     try {
       setIsLoading(true);
 
-      await axios.post("api/posts", { body });
+      const url = isComment ? `/api/comments?postId=${postId}` : "/api/posts";
+
+      await axios.post(url, { body });
 
       toast.success("Post successfully");
       setBody("");
       mutatePosts();
+      mutatePost()
     } catch (error) {
       toast.error("something went wrong");
     } finally {
       setIsLoading(false);
     }
-  }, [body, mutatePosts]);
+  }, [body, mutatePosts,mutatePost, isComment, postId]);
   return (
     <div className="border-b-[1px] border-neutral-800 px-5 py-2">
       {currentUser ? (
@@ -55,7 +60,11 @@ const Form: React.FC<FormProps> = ({ placeholder, isComment, postId }) => {
             ></textarea>
             <hr className="opacity-0 peer-focus:opacity-100 h-[1px] w-full border-neutral-800 transition" />
             <div className="mt-4 flex flex-row justify-end">
-              <Button label="Tweet" disabled={isLoading || !body} onClick={onSubmit} />
+              <Button
+                label="Tweet"
+                disabled={isLoading || !body}
+                onClick={onSubmit}
+              />
             </div>
           </div>
         </div>
