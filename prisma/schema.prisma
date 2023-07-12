@@ -14,7 +14,7 @@ model User {
   id String @id @default(auto()) @map("_id") @db.ObjectId
   name String?
   username String? @unique
-  bio String? @unique
+  bio String? 
   email String? @unique
   emailVerified DateTime?
   image String?
@@ -28,7 +28,7 @@ model User {
 
   posts Post[]
   commments Comment[]
-  notificaitions Notification[]
+  notifications Notification[]
 }
 
 model Post {
@@ -38,7 +38,7 @@ model Post {
   updatedAt DateTime @updatedAt
   userId String @db.ObjectId
   likedIds String[] @db.ObjectId
-
+  image              String?
   user User @relation(fields: [userId],references: [id],onDelete:Cascade)
 
   comments Comment[]
